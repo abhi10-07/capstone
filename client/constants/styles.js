@@ -1,8 +1,6 @@
 export const GlobalStyles = {
   container: {
     flex: 1,
-    padding: 24,
-    marginTop: 10,
   },
   colors: {
     primary50: "#e4d9fd",
@@ -17,5 +15,7 @@ export const GlobalStyles = {
     error500: "#9b095c",
     gray500: "#39324a",
     gray700: "#221c30",
+    error100: "#fcdcbf",
+    error500: "#f37c13",
   },
 };
