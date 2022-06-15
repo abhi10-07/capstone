@@ -1,6 +1,35 @@
 export const GlobalStyles = {
   container: {
     flex: 1,
+    padding: 20,
+    backgroundColor: "#191919",
+    color: "#fff",
+  },
+  header: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: 900,
+  },
+  iconAlign: {
+    verticalAlign: "middle",
+  },
+  stockW: {
+    width: "59%",
+  },
+  numberW: {
+    width: "21%",
+  },
+  xsFont: {
+    fontSize: 10,
+  },
+  smFont: {
+    fontSize: 12,
+  },
+  mdFont: {
+    fontSize: 14,
+  },
+  lgFont: {
+    fontSize: 16,
   },
   colors: {
     primary50: "#e4d9fd",

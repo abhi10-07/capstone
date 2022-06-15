@@ -1,35 +1,123 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View /* include other react-native components here as needed */ } from 'react-native';
-import { useStocksContext } from '../contexts/StocksContext';
-import { scaleSize } from '../constants/Layout';
+import React, { useState, useEffect } from "react";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 
+import { useStocksContext } from "../contexts/StocksContext";
+import { scaleSize } from "../constants/Layout";
+import { GlobalStyles } from "../constants/styles";
+import { FMI_KEY, FMI_URL } from "../constants";
+import StockListItem from "../components/StockListItem";
 
-// FixMe: implement other components and functions used in StocksScreen here (don't just put all the JSX in StocksScreen below)
-
-
-
-
-
-
-
-export default function StocksScreen({route}) {
+export default function StocksScreen({ route }) {
   const { ServerURL, watchList } = useStocksContext();
-  const [state, setState] = useState({ /* FixMe: initial state here */ });
+  const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState([]);
+  const [offset, setOffset] = useState(1);
 
-  // can put more code here
+  useEffect(() => getData(), []);
 
-  useEffect(() => {
-    // FixMe: fetch stock data from the server for any new symbols added to the watchlist and save in local StocksScreen state  
-  }, [watchList]);
+  const getData = () => {
+    setLoading(true);
+    fetch(FMI_URL(FMI_KEY))
+      .then((res) => res.json())
+      .then((stocks) =>
+        stocks.map((stock) => {
+          setOffset(offset + 1);
+          return {
+            symbol: stock.symbol,
+            name: stock.name,
+            price: stock.price,
+            exchangeShortName: stock.exchangeShortName,
+            type: stock.type,
+          };
+        })
+      )
+      .then((symbols) => {
+        setDataSource(symbols);
+        setLoading(false);
+      });
+  };
+
+  const renderFooter = () => {
+    return (
+      //Footer View with Load More button
+      <View style={styles.footer}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={getData}
+          //On Click of button load more data
+          style={styles.loadMoreBtn}
+        >
+          <Text style={styles.btnText}>Load More</Text>
+          {loading ? (
+            <ActivityIndicator color="white" style={{ marginLeft: 8 }} />
+          ) : null}
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderStockItem = (itemData) => {
+    return <StockListItem {...itemData.item} />;
+  };
+
+  const ItemSeparatorView = () => {
+    return (
+      <View
+        style={{
+          height: 0.5,
+          width: "100%",
+          backgroundColor: "#C8C8C8",
+        }}
+      />
+    );
+  };
 
   return (
-    <View style={styles.container}>
-        {/* FixMe: add children here! */ }
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={GlobalStyles.container}>
+        <FlatList
+          data={dataSource}
+          keyExtractor={(item, index) => index.toString()}
+          ItemSeparatorComponent={ItemSeparatorView}
+          enableEmptySections={true}
+          renderItem={renderStockItem}
+          ListFooterComponent={renderFooter}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // FixMe: add styles here ...
-  // use scaleSize(x) to adjust sizes for small/large screens
-  });
+  container: {
+    justifyContent: "center",
+    flex: 1,
+  },
+  footer: {
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  loadMoreBtn: {
+    padding: 10,
+    backgroundColor: "#800000",
+    borderRadius: 4,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  btnText: {
+    color: "white",
+    fontSize: 15,
+    textAlign: "center",
+  },
+});
